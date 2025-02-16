@@ -1,0 +1,70 @@
+# IDE and build tool files
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Node.js (React) files
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json
+yarn.lock
+
+# React build files
+build/
+dist/
+
+# Log files
+*.log
+*.log.*
+
+# IntelliJ specific
+out/
+target/
+
+# Java specific
+*.class
+*.jar
+*.war
+*.ear
+*.db
+
+# Spring Boot specific
+*.pid
+*.bak
+*.swp
+
+# Operating System files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# .env files for environment variables (sensitive info)
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Gradle and Maven
+.gradle/
+.mvn/
+target/
+build/
+
+# Java archives and test output
+*.tar.gz
+*.zip
+*.tar
+*.gz
+*.log
+
+# IntelliJ specific settings for multiple module projects
+.idea/.name
+.idea/.idea_modules
+.idea/workspace.xml
+.idea/modules.xml
+.idea/encodings.xml
+.idea/dictionaries/
+.idea/libraries/

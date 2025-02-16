@@ -18,3 +18,30 @@ body.toggle-sidebar .main {
   height: 100vh; /* Full-screen height */
   background-color: #f8f9fa; /* Light background */
 }
+
+/* btn-muted' : 'btn-outline-muted */
+
+/* 'btn-light' : 'btn-outline-light' */
+
+/* Solid custom button (e.g. "btn-muted") */
+.btn-muted {
+  color: #fff;
+  background-color: #6c757d;  /* your custom muted color */
+  border: 1px solid #6c757d;
+  font-size: 1rem;
+  line-height: 1.5;
+  border-radius: 0.25rem;
+  transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
+}
+
+.btn-muted:hover,
+.btn-muted:focus,
+.btn-muted:active {
+  background-color: #565e64;  /* slightly darker */
+  border-color: #565e64;
+}
+
+/* In calender.css */
+.table .tdw {
+  width: 210px !important; /* Increase the width to your preference */
+}
