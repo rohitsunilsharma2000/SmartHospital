@@ -5,43 +5,66 @@ import StatusButtons from "../status-buttons/StatusButtons";
 
 export default function DoctorAvailabilityCalendarPage() {
   // List of doctors (can be fetched dynamically)
-  const doctorList = [
-    "Dr. Kailash Gokra",
-    "Dr. Smith Johnson",
-    "Dr. Alice Brown",
+  const doctorData = [{
+    doctorId: 1,
+    doctorName: "Dr. John Doe",
+    department: "Cardiology",
+    slots: {
+      "07:00 AM": [
+        { slotId: 101, startTime: "07:00", endTime: "07:10", status: "AVAILABLE" },
+        { slotId: 102, startTime: "07:10", endTime: "07:20", status: "AVAILABLE" },
+        { slotId: 103, startTime: "07:20", endTime: "07:30", status: "WALKIN" },
+        { slotId: 104, startTime: "07:30", endTime: "07:40", status: "CANCELLED" },
+        { slotId: 105, startTime: "07:40", endTime: "07:50", status: "BLOCKED" },
+        { slotId: 106, startTime: "07:50", endTime: "08:00", status: "RESERVED" }
+      ],
+      "09:00 PM": [
+        { slotId: 107, startTime: "08:00", endTime: "08:10", status: "UNAVAILABLE" },
+        { slotId: 108, startTime: "08:10", endTime: "08:20", status: "AVAILABLE" },
+        { slotId: 109, startTime: "08:20", endTime: "08:30", status: "BOOKED" },
+        { slotId: 110, startTime: "08:30", endTime: "08:40", status: "ARRIVED" },
+        { slotId: 111, startTime: "08:40", endTime: "08:50", status: "COMPLETED" },
+        { slotId: 112, startTime: "08:50", endTime: "09:00", status: "NO_SHOW" }
+      ]
+    }
+  }, {
+
+    doctorId: 2,
+    doctorName: "Dr. John Doe",
+    department: "Cardiology",
+    slots: {
+      "07:00 AM": [
+        { slotId: 101, startTime: "07:00", endTime: "07:10", status: "AVAILABLE" },
+        { slotId: 102, startTime: "07:10", endTime: "07:20", status: "AVAILABLE" },
+        { slotId: 103, startTime: "07:20", endTime: "07:30", status: "WALKIN" },
+        { slotId: 104, startTime: "07:30", endTime: "07:40", status: "CANCELLED" },
+        { slotId: 105, startTime: "07:40", endTime: "07:50", status: "BLOCKED" },
+        { slotId: 106, startTime: "07:50", endTime: "08:00", status: "RESERVED" }
+      ],
+      "09:00 PM": [
+        { slotId: 107, startTime: "08:00", endTime: "08:10", status: "UNAVAILABLE" },
+        { slotId: 108, startTime: "08:10", endTime: "08:20", status: "AVAILABLE" },
+        { slotId: 109, startTime: "08:20", endTime: "08:30", status: "BOOKED" },
+        { slotId: 110, startTime: "08:30", endTime: "08:40", status: "ARRIVED" },
+        { slotId: 111, startTime: "08:40", endTime: "08:50", status: "COMPLETED" },
+        { slotId: 112, startTime: "08:50", endTime: "09:00", status: "NO_SHOW" }
+      ]
+    }
+
+  }];
+
+  const hours = [
+    "07:00 AM", "08:00 AM", "09:00 AM", "10:00 AM", "11:00 AM",
+    "12:00 PM", "01:00 PM", "02:00 PM", "03:00 PM", "04:00 PM",
+    "05:00 PM", "06:00 PM", "07:00 PM", "08:00 PM", "09:00 PM"
   ];
 
-  // Initialize state with dynamic doctors
-  const initialDoctorState = doctorList.reduce((acc, doctor) => {
-    acc[doctor] = {
-      unavailable: false,
-      available: true,
-      booked: false,
-      additional: false,
-      arrived: false,
-      completed: false,
-      walkin: false,
-      blocked: false,
-      noShow: false,
-      reserved: false,
-    };
-    return acc;
-  }, {});
-
-  const [doctorAvailability, setDoctorAvailability] =
-    useState(initialDoctorState);
-  const [selectedDoctor, setSelectedDoctor] = useState(doctorList[0]); // Default to the first doctor
-
-  // Generic handler to update any doctor's availability
-  const handleDoctorAvailabilityChange = (doctor, status) => {
-    setDoctorAvailability((prevState) => ({
-      ...prevState,
-      [doctor]: {
-        ...prevState[doctor],
-        [status]: !prevState[doctor][status], // Toggle the specific status
-      },
-    }));
+  const formatHour = (hour) => {
+    const amPm = hour < 12 ? "AM" : "PM";
+    const formattedHour = hour % 12 === 0 ? 12 : hour % 12;
+    return `${String(formattedHour).padStart(2, "0")}:00 ${amPm}`;
   };
+
 
   return (
     <>
@@ -79,7 +102,7 @@ export default function DoctorAvailabilityCalendarPage() {
                     <label htmlFor="doctor" className="col-form-label">
                       Dr:
                     </label>
-                    <select
+                    {/* <select
                       className="form-select"
                       value={selectedDoctor}
                       onChange={(e) => setSelectedDoctor(e.target.value)}
@@ -89,7 +112,7 @@ export default function DoctorAvailabilityCalendarPage() {
                           {doctor}
                         </option>
                       ))}
-                    </select>
+                    </select> */}
                   </div>
 
                   {/* Navigation Buttons */}
@@ -152,52 +175,56 @@ export default function DoctorAvailabilityCalendarPage() {
                         <tr>
                           <th scope="col">Doctor</th>
                           <th scope="col">Availability</th>
-                          <th scope="col">7 AM</th>
-                          <th scope="col">8 AM</th>
-                          <th scope="col">9 AM</th>
-                          <th scope="col">10 AM</th>
-                          <th scope="col">11 AM</th>
-                          <th scope="col">12 PM</th>
-                          <th scope="col">1 PM</th>
-                          <th scope="col">2 PM</th>
-                          <th scope="col">3 PM</th>
-                          <th scope="col">4 PM</th>
-                          <th scope="col">5 PM</th>
-                          <th scope="col">6 PM</th>
-                          <th scope="col">7 PM</th>
-                          <th scope="col">8 PM</th>
-                          <th scope="col">9 PM</th>
+                          {hours.map((hour) => (
+                            <th key={hour}>{hour}</th>
+                          ))}
                         </tr>
                       </thead>
                       <tbody>
-                        <tr>
-                          <th scope="row">{selectedDoctor}</th>
-                          <td>
-                            <div className="d-flex align-items-center flex-column mb-3">
-                              <p>10:00 AM - 01:20 PM</p>
-                              <p>Consultation</p>
-                              <p>Edit Shift Block Print</p>
-                              <p>02:00 PM - 08:00 PM</p>
-                              <p>Consultation Video</p>
-                              <p>Edit Shift Block Print</p>
-                            </div>
-                          </td>
-                          {[...Array(13)].map((_, index) => (
-                            <td key={index}>
-                              <StatusButtons
-                                availability={
-                                  doctorAvailability[selectedDoctor]
-                                }
-                                onStatusChange={(status) =>
-                                  handleDoctorAvailabilityChange(
-                                    selectedDoctor,
-                                    status
-                                  )
-                                }
-                              />
+
+                        {doctorData.map((doctor) => (
+                          <tr key={doctor.doctorId}>
+                            <td>
+                              <p className="shift-time">{doctor.doctorName}</p>
                             </td>
-                          ))}
-                        </tr>
+                            <td>
+                              <div className="d-flex flex-column align-items-center p-1">
+                                <div className="shift-block">
+                                  <p className="shift-time">10:00 AM - 01:20 PM</p>
+                                  <p className="shift-type">Consultation</p>
+                                  <button className="btn btn-xs btn-outline-primary">Edit</button>
+                                </div>
+
+                                <div className="shift-block">
+                                  <p className="shift-time">02:00 PM - 08:00 PM</p>
+                                  <p className="shift-type">Consultation Video</p>
+                                  <button className="btn btn-xs btn-outline-primary">Edit</button>
+                                </div>
+                              </div>
+                            </td>
+
+                            {hours.map((hour) => {
+                              const slots = doctor.slots[hour];
+                              // Pick a representative slot (taking the first slot of the hour)
+                              const representativeSlot = slots ? slots[0] : null;
+
+                              return (
+                                <td key={`${doctor.doctorId}-${hour}`}>
+                                  {doctor.slots[hour] ? (
+                                    <StatusButtons slots={doctor.slots[hour]} />
+                                  ) : (
+                                    <span className="text-muted">No Slots</span>
+                                  )}
+                                </td>
+
+                              );
+                            })}
+
+                          </tr>
+                        ))}
+
+
+
                       </tbody>
                     </table>
                   </div>
@@ -206,22 +233,43 @@ export default function DoctorAvailabilityCalendarPage() {
             </div>
           </div>
           <div className="row mb-3">
-  <div className="col-12">
-    <p><strong>Color Meanings:</strong></p>
-    <ul>
-      <li><span className="badge bg-danger">Unavailable</span>: Indicates that the slot is not available for booking or selection.</li>
-      <li><span className="badge bg-success">Available</span>: Represents an open or available time slot.</li>
-      <li><span className="badge bg-warning">Booked</span>: Indicates that the slot has been reserved or booked.</li>
-      <li><span className="badge bg-primary">Additional Slots</span>: Represents additional time slots that may be available.</li>
-      <li><span className="badge bg-info">Arrived</span>: Indicates that the patient or individual has arrived for the appointment.</li>
-      <li><span className="badge bg-secondary">Completed</span>: Represents that the appointment or task has been completed.</li>
-      <li><span className="badge bg-dark">Walkin</span>: Represents a walk-in client or individual, who doesn't have an appointment.</li>
-      <li><span className="badge bg-muted">Blocked</span>: Indicates that the slot is blocked and cannot be used.</li>
-      <li><span className="badge bg-light">No Show</span>: Indicates that the patient or individual didn't show up for the appointment.</li>
-      <li><span className="badge bg-dark">Reserved</span>: Represents a reserved slot for a particular individual or event.</li>
-    </ul>
-  </div>
-</div>
+            <div className="col-12">
+              <p><strong>Color Meanings:</strong></p>
+              <ul className="list-group">
+                <li className="list-group-item">
+                  <span className="badge bg-danger">Unavailable</span>: The slot is not available for booking.
+                </li>
+                <li className="list-group-item">
+                  <span className="badge bg-success">Available</span>: The slot is open and can be booked.
+                </li>
+                <li className="list-group-item">
+                  <span className="badge bg-warning">Booked</span>: The slot has been reserved by a patient.
+                </li>
+                <li className="list-group-item">
+                  <span className="badge bg-info">Arrived</span>: The patient has arrived for their appointment.
+                </li>
+                <li className="list-group-item">
+                  <span className="badge bg-secondary">Completed</span>: The appointment has been successfully completed.
+                </li>
+                <li className="list-group-item">
+                  <span className="badge bg-light text-dark">No Show</span>: The patient did not attend the appointment.
+                </li>
+                <li className="list-group-item">
+                  <span className="badge bg-dark">Walk-in</span>: The slot was used by a walk-in patient without prior booking.
+                </li>
+                <li className="list-group-item">
+                  <span className="badge bg-danger">Cancelled</span>: The appointment was cancelled by the patient or hospital.
+                </li>
+                <li className="list-group-item">
+                  <span className="badge bg-muted">Blocked</span>: The slot is blocked and cannot be scheduled.
+                </li>
+                <li className="list-group-item">
+                  <span className="badge bg-dark">Reserved</span>: The slot is reserved for a specific case or emergency.
+                </li>
+              </ul>
+
+            </div>
+          </div>
 
         </div>
       </section>
