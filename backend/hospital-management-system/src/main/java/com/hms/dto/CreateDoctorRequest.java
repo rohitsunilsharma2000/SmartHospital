@@ -1,7 +1,10 @@
 package com.hms.dto;
 
+import lombok.Data;
+
 import java.util.List;
 
+@Data
 public class CreateDoctorRequest {
     private String name;
     private String department;
