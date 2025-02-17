@@ -14,5 +14,6 @@ public enum SlotStatus {
     WALKIN,
     BLOCKED,
     NO_SHOW,
-    RESERVED
+    RESERVED,
+    CANCELLED
 }

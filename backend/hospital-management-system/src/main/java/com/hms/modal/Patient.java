@@ -68,4 +68,5 @@ public class Patient {
     private String ivrLanguage;
     private String birthWeight;
     private String notes;
+
 }

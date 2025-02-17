@@ -1,103 +1,124 @@
 package com.hms.service.impl;
 
 import com.hms.dto.CreateDoctorRequest;
+import com.hms.dto.DoctorSlotResponse;
+import com.hms.dto.SlotResponse;
+import com.hms.enums.SlotStatus;
 import com.hms.modal.Availability;
 import com.hms.modal.Doctor;
+import com.hms.modal.SlotReservation;
 import com.hms.repository.AvailabilityRepository;
 import com.hms.repository.DoctorRepository;
+import com.hms.repository.SlotReservationRepository;
 import com.hms.service.DoctorService;
-import lombok.extern.slf4j.Slf4j;
+import com.hms.service.DoctorSlotService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
-@Slf4j
+
 @Service
 public class DoctorServiceImpl implements DoctorService {
 
     private final DoctorRepository doctorRepository;
+    private final DoctorSlotService doctorSlotService;
     private final AvailabilityRepository availabilityRepository;
-    public DoctorServiceImpl( DoctorRepository doctorRepository , AvailabilityRepository availabilityRepository ) {
+    private final SlotReservationRepository slotReservationRepository;
+
+    public DoctorServiceImpl ( DoctorRepository doctorRepository , DoctorSlotService doctorSlotService , AvailabilityRepository availabilityRepository , SlotReservationRepository slotReservationRepository ) {
         this.doctorRepository = doctorRepository;
+        this.doctorSlotService = doctorSlotService;
         this.availabilityRepository = availabilityRepository;
-    }
-
-    public Doctor registerDoctor(CreateDoctorRequest request) {
-        log.info("Registering a new doctor: {}", request.getName());
-
-        // Creating doctor instance
-        Doctor doctor = Doctor.builder()
-                .name(request.getName())
-                .department(request.getDepartment())
-                .outPatient(request.getOutPatient())
-                .busyTime(request.getBusyTime())
-                .notificationSchedules(request.getNotificationSchedules())
-                .build();
-
-        // Logging the creation of the doctor object
-        log.info("Created doctor: {}", doctor);
-
-        // Saving the doctor to the repository
-        Doctor savedDoctor = doctorRepository.save(doctor);
-        List<Availability> availabilities = request.getAvailability().stream()
-                                                   .map(a -> Availability.builder()
-                                                                         .day(a.getDay().toUpperCase()) // Ensure the correct field name is used
-                                                                         .startTime(a.getStartTime())
-                                                                         .endTime(a.getEndTime())
-                                                                         .doctor(doctor)
-                                                                         .build())
-                                                   .collect(Collectors.toList());
-
-        availabilityRepository.saveAll(availabilities);
-
-        // Logging after saving
-        log.info("Doctor saved successfully with ID: {}", savedDoctor.getId());
-
-        return savedDoctor;
+        this.slotReservationRepository = slotReservationRepository;
     }
 
     @Override
     @Transactional
-    public List<Doctor> registerMultipleDoctors(List<CreateDoctorRequest> requests) {
-        log.info("Registering multiple doctors. Number of doctors: {}", requests.size());
 
-        // Creating doctor instances
-        List<Doctor> doctors = requests.stream()
-                                       .map(request -> Doctor.builder()
-                                                             .name(request.getName())
-                                                             .department(request.getDepartment())
-                                                             .outPatient(request.getOutPatient())
-                                                             .busyTime(request.getBusyTime())
-                                                             .notificationSchedules(request.getNotificationSchedules())
-                                                             .build())
-                                       .collect(Collectors.toList());
+    public Doctor registerDoctor ( CreateDoctorRequest request , String startTime , String endTime , List<String> days , List<String> dates ) {
+        // Register doctor
+        Doctor doctor = Doctor.builder()
+                              .name(request.getName())
+                              .department(request.getDepartment())
+                              .outPatient(request.getOutPatient())
+                              .busyTime(request.getBusyTime())
+                              .notificationSchedules(request.getNotificationSchedules())
+                              .build();
 
-        log.info("Saving {} doctors to the repository.", doctors.size());
+        doctor = doctorRepository.save(doctor);
 
-        // Saving doctors in batch
-        List<Doctor> savedDoctors = doctorRepository.saveAll(doctors);
-        log.info("Successfully saved {} doctors.", savedDoctors.size());
+        // Generate Slots for Doctor
+        List<DoctorSlotResponse> slots = doctorSlotService.generateOrUpdateDoctorSlots(doctor.getId() , startTime ,
+                                                                                       endTime , days , dates);
 
-        // Adding availability for each doctor
-        List<Availability> availabilities = savedDoctors.stream()
-                                                        .flatMap(doctor -> {
-                                                            CreateDoctorRequest request = requests.get(savedDoctors.indexOf(doctor)); // Get corresponding request
-                                                            return request.getAvailability().stream()
-                                                                          .map(a -> Availability.builder()
-                                                                                                .day(a.getDay().toUpperCase())
-                                                                                                .startTime(a.getStartTime())
-                                                                                                .endTime(a.getEndTime())
-                                                                                                .doctor(doctor)
-                                                                                                .build());
-                                                        })
-                                                        .collect(Collectors.toList());
+        // Track Slot Reservations for the Doctor
+        for (DoctorSlotResponse slotResponse : slots) {
+            for (SlotResponse slot : slotResponse.getSlots()) {
+                Availability slotEntity = availabilityRepository.findById(slot.getSlotId())
+                                                                .orElseThrow(
+                                                                        () -> new RuntimeException("Slot not found"));
 
-        log.info("Saving {} availability entries.", availabilities.size());
-        availabilityRepository.saveAll(availabilities);
-        log.info("Successfully saved all availability records.");
+                SlotReservation reservation = SlotReservation.builder()
+                                                             .doctor(doctor)
+                                                             .slot(slotEntity)
+                                                             .status(SlotStatus.AVAILABLE)
+                                                             .reservationTime(LocalDateTime.now())
+                                                             .notes("Doctor's availability slot created.")
+                                                             .build();
 
-        return savedDoctors;
+                slotReservationRepository.save(reservation);
+            }
+        }
+
+        return doctor;
     }
+
+
+    @Override
+    @Transactional
+    public List<Doctor> registerMultipleDoctors ( List<CreateDoctorRequest> requests , String startTime , String endTime , List<String> days , List<String> dates ) {
+        List<Doctor> doctors = requests.stream()
+                                       .map(request -> {
+                                           Doctor doctor = Doctor.builder()
+                                                                 .name(request.getName())
+                                                                 .department(request.getDepartment())
+                                                                 .outPatient(request.getOutPatient())
+                                                                 .busyTime(request.getBusyTime())
+                                                                 .notificationSchedules(
+                                                                         request.getNotificationSchedules())
+                                                                 .build();
+                                           return doctorRepository.save(doctor);
+                                       })
+                                       .toList();
+
+        // Generate Slots & Track Reservations for Each Doctor
+        doctors.forEach(doctor -> {
+            List<DoctorSlotResponse> slots = doctorSlotService.generateOrUpdateDoctorSlots(doctor.getId() , startTime ,
+                                                                                           endTime , days , dates);
+
+            for (DoctorSlotResponse slotResponse : slots) {
+                for (SlotResponse slot : slotResponse.getSlots()) {
+                    Availability slotEntity = availabilityRepository.findById(slot.getSlotId())
+                                                                    .orElseThrow(() -> new RuntimeException(
+                                                                            "Slot not found"));
+
+//                     Create Slot Reservation for the Doctor
+                    SlotReservation reservation = SlotReservation.builder()
+                                                                 .doctor(doctor)
+                                                                 .slot(slotEntity)
+                                                                 .status(SlotStatus.AVAILABLE)
+                                                                 .reservationTime(LocalDateTime.now())
+                                                                 .notes("Doctor's availability slot created.")
+                                                                 .build();
+
+                    slotReservationRepository.save(reservation);
+                }
+            }
+        });
+
+        return doctors;
+    }
+
 }

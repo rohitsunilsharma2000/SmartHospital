@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Entity
 @Table(name = "availabilities")
 @Data
@@ -27,6 +29,9 @@ public class Availability {
     private String startTime; // e.g., "07:00"
 
     @Column(nullable = false)
+    private LocalDate date;
+
+    @Column(nullable = false)
     private String endTime; // e.g., "21:00"
 
     // For example: "Consultation" or "Video Consultation"
@@ -41,8 +46,12 @@ public class Availability {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false) // Ensures database does not allow NULL values
     private SlotStatus status = SlotStatus.AVAILABLE;  // Default value
-//    private SlotStatus status;  // Slot status (e.g., AVAILABLE, BOOKED, BLOCKED)
 
-
-
+    @PrePersist
+    public void setDefaultDate() {
+        if (this.date == null) {
+            this.date = LocalDate.now(); // Set current date if not provided
+        }
+    }
 }
+

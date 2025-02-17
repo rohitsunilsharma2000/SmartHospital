@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "slot_reservations")
 @Data
@@ -19,9 +21,9 @@ public class SlotReservation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Slot status (see enum below)
     @Enumerated(EnumType.STRING)
-    private SlotStatus status;
+    @Column(nullable = false)
+    private SlotStatus status; // To track booking, walk-in, etc.
 
     // For example, the count of additional slots if applicable.
     private Integer additionalSlots;
@@ -38,4 +40,21 @@ public class SlotReservation {
     @ManyToOne
     @JoinColumn(name = "doctor_id")
     private Doctor doctor;
+
+
+    @ManyToOne
+    @JoinColumn(name = "patient_id", nullable = true)
+    private Patient patient; // Optional for initial slot assignment
+
+    @ManyToOne
+    @JoinColumn(name = "slot_id", nullable = false)
+    private Availability slot;
+
+
+    @Column(nullable = false)
+    private LocalDateTime reservationTime;
+
+    private String notes;
+
 }
+

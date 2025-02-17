@@ -16,7 +16,8 @@ class SlotResponse {
     private String startTime;
     private String endTime;
     private SlotStatus status;
-
+    private String day;         // New field for the day (Monday, Tuesday, etc.)
+    private String date;
     public SlotStatus getStatus() {
         return status != null ? status : SlotStatus.AVAILABLE; // Default value handling
     }
