@@ -11,4 +11,5 @@ public class CreateDoctorRequest {
     private Boolean outPatient;
     private String busyTime;
     private List<String> notificationSchedules;
+    private List<DayAvailabilityRequest> availability; // New field
 }
