@@ -41,4 +41,14 @@ public class BillingItem {
     @ManyToOne
     @JoinColumn(name = "bill_id")
     private Bill bill;
+
+
+
+    @ManyToOne
+    @JoinColumn(name = "opd_bill_id", nullable = false)
+    private OpdBill opdBill;
+
+    private String itemType;  // e.g., Consultation, Test, Medicine
+    private String itemName;
+
 }
