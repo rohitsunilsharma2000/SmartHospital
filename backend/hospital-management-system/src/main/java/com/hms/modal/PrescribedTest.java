@@ -25,6 +25,14 @@ public class PrescribedTest {
     // Quantity of the test ordered
     private Integer quantity;
 
+    // ✅ Add missing fields
+    @Column(nullable = false)
+    private Double unitPrice; // ✅ Test cost per unit
+
+    @Column(nullable = false)
+    private Double total; // ✅ Total cost (calculated as `unitPrice * quantity`)
+
+
     // Note or instructions to the lab
     private String noteOrInstructions;
 

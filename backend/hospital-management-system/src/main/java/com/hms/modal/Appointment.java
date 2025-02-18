@@ -57,6 +57,9 @@ public class Appointment {
     @Column(nullable = false)
     private String status; // Scheduled, Completed, Cancelled
 
-
+    // ✅ Constructor with ID only
+    public Appointment(Long id) {
+        this.id = id;
+    }
 
 }

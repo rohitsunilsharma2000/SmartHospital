@@ -36,6 +36,16 @@ public class PrescribedMedicine {
 
     // Many medicines belong to one Prescription
     @ManyToOne
-    @JoinColumn(name = "prescription_id")
+    @JoinColumn(name = "prescription_id", nullable = false)
     private Prescription prescription;
+
+    @Column(nullable = false)
+    private Double unitPrice;  // ✅ Medicine price per unit
+
+    @Column(nullable = false)
+    private Integer quantity;  // ✅ Number of units prescribed
+
+    @Column(nullable = false)
+    private Double total;  // ✅ Total cost (calculated as `unitPrice * quantity`)
+
 }

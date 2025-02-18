@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -25,7 +26,7 @@ public class OpdBill {
     private Appointment appointment; // ✅ OPD Bills are linked to an appointment
 
     @OneToMany(mappedBy = "opdBill", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<BillingItem> billingItems; // ✅ List of Billing Items (Consultation, Tests, etc.)
+    private List<BillingItem> billingItems = new ArrayList<>();  // ✅ Initialize with empty list // ✅ List of Billing Items (Consultation, Tests, etc.)
 
     @Embedded
     private InsuranceOption insuranceOption; // ✅ Embedded Insurance Information

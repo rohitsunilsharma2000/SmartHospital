@@ -1,11 +1,10 @@
 package com.hms.dto;
 
-import com.hms.modal.BillingItem;
-import com.hms.modal.InsuranceOption;
-import com.hms.modal.Payment;
+import com.hms.modal.*;
 import lombok.Builder;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,13 +27,51 @@ public class OpdBillResponse {
                               .appointmentId(opdBill.getAppointment().getId())
                               .isInsuranceApplied(opdBill.getIsInsuranceApplied())
                               .insuranceOption(opdBill.getInsuranceOption())
-                              .billingItems(opdBill.getBillingItems().stream()
-                                                   .map(BillingItemResponse::fromEntity)
-                                                   .collect(Collectors.toList()))
+                              .billingItems(opdBill.getBillingItems() != null ?
+                                                    opdBill.getBillingItems().stream()
+                                                           .map(BillingItemResponse::fromEntity)
+                                                           .collect(Collectors.toList())
+                                                    : new ArrayList<>())  // ✅ Prevent NullPointerException
                               .totalAmount(opdBill.getTotalAmount())
                               .discountAmount(opdBill.getDiscountAmount())
                               .finalAmount(opdBill.getFinalAmount())
-                              .payment(opdBill.getPayment()) // ✅ No need for extra transformation
+                              .payment(opdBill.getPayment())  // ✅ No need for extra transformation
                               .build();
     }
-}
+
+
+        private List<PrescribedMedicineResponse> prescribedMedicines;
+        private List<PrescribedTestResponse> prescribedTests;
+
+
+        // ✅ Updated fromEntity Method to Include All Items
+        public static OpdBillResponse fromEntity2(
+                com.hms.modal.OpdBill opdBill,
+                List<BillingItem> billingItems,
+                List<PrescribedMedicine> prescribedMedicines,
+                List<PrescribedTest> prescribedTests
+        ) {
+            return OpdBillResponse.builder()
+                                  .id(opdBill.getId())
+                                  .appointmentId(opdBill.getAppointment().getId())
+                                  .isInsuranceApplied(opdBill.getIsInsuranceApplied())
+                                  .insuranceOption(opdBill.getInsuranceOption())
+                                  .billingItems(billingItems.stream()
+                                                            .map(BillingItemResponse::fromEntity)
+                                                            .collect(Collectors.toList()))
+                                  .prescribedMedicines(prescribedMedicines.stream()
+                                                                          .map(PrescribedMedicineResponse::fromEntity)
+                                                                          .collect(Collectors.toList()))
+                                  .prescribedTests(prescribedTests.stream()
+                                                                  .map(PrescribedTestResponse::fromEntity)
+                                                                  .collect(Collectors.toList()))
+                                  .totalAmount(opdBill.getTotalAmount())
+                                  .discountAmount(opdBill.getDiscountAmount())
+                                  .finalAmount(opdBill.getFinalAmount())
+                                  .payment(opdBill.getPayment())
+                                  .build();
+        }
+    }
+
+
+

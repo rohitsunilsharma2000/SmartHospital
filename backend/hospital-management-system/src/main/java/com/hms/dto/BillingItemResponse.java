@@ -16,9 +16,9 @@ public class BillingItemResponse {
     private Double discount;
     private Double total;
 
+
     public static BillingItemResponse fromEntity(BillingItem item) {
         return BillingItemResponse.builder()
-                                  .id(item.getId())
                                   .type(item.getType())
                                   .name(item.getName())
                                   .unitPrice(item.getUnitPrice())
