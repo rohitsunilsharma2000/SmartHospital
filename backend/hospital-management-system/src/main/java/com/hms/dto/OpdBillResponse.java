@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 @Builder
@@ -15,7 +16,7 @@ public class OpdBillResponse {
     private Long appointmentId;
     private Boolean isInsuranceApplied;
     private InsuranceOption insuranceOption;
-    private List<BillingItem> billingItems; // ✅ No reference back to OpdBill
+    private List<BillingItemResponse> billingItems; // ✅ No reference back to OpdBill
     private Double totalAmount;
     private Double discountAmount;
     private Double finalAmount;
@@ -27,7 +28,9 @@ public class OpdBillResponse {
                               .appointmentId(opdBill.getAppointment().getId())
                               .isInsuranceApplied(opdBill.getIsInsuranceApplied())
                               .insuranceOption(opdBill.getInsuranceOption())
-                              .billingItems(opdBill.getBillingItems()) // ✅ No infinite reference
+                              .billingItems(opdBill.getBillingItems().stream()
+                                                   .map(BillingItemResponse::fromEntity)
+                                                   .collect(Collectors.toList()))
                               .totalAmount(opdBill.getTotalAmount())
                               .discountAmount(opdBill.getDiscountAmount())
                               .finalAmount(opdBill.getFinalAmount())

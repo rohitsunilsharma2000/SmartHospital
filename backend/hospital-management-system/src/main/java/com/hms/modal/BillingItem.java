@@ -1,5 +1,6 @@
 package com.hms.modal;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -46,6 +47,7 @@ public class BillingItem {
 
     @ManyToOne
     @JoinColumn(name = "opd_bill_id", nullable = false)
+    @JsonIgnore // ✅ Prevents infinite recursion
     private OpdBill opdBill;
 
     private String itemType;  // e.g., Consultation, Test, Medicine
