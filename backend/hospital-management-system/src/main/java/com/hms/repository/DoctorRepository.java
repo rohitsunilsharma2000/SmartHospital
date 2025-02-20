@@ -26,4 +26,6 @@ public interface DoctorRepository extends JpaRepository<Doctor, Long> {
     // Type-ahead search using partial match on Doctor ID
     @Query("SELECT d FROM Doctor d WHERE CAST(d.id AS string) LIKE CONCAT(:query, '%')")
     List<Doctor> findByIdStartingWith(@Param("query") String query);
+
+    boolean existsByNameAndDepartment(String name, String department);
 }

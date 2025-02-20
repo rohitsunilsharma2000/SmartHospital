@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface PatientRepository extends JpaRepository<Patient, Long> {
@@ -16,4 +17,10 @@ public interface PatientRepository extends JpaRepository<Patient, Long> {
 
     // ✅ Search By Name - Type-Ahead (Ignore Case)
     List<Patient> findByFirstNameStartingWithIgnoreCaseOrLastNameStartingWithIgnoreCase(String firstName, String lastName);
+    boolean existsByEmail(String email);
+
+    boolean existsByMobile(String mobile);
+
+    boolean existsByFirstNameAndLastNameAndDateOfBirth(String firstName, String lastName, LocalDate dateOfBirth);
+
 }

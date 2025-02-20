@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -16,4 +18,9 @@ public class AppointmentRequest {
     private Long patientId;
     private Long slotId;
     private AppointmentType appointmentType;
+
+    private String mainComplaint;
+    private String visitType;
+    private LocalDateTime appointmentDateTime;
+
 }

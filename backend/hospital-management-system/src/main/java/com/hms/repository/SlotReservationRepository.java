@@ -1,6 +1,8 @@
 package com.hms.repository;
 
 
+import com.hms.modal.Availability;
+import com.hms.modal.Doctor;
 import com.hms.modal.SlotReservation;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -26,5 +28,9 @@ public interface SlotReservationRepository extends JpaRepository<SlotReservation
 
     // Find existing reservation by doctor and slot (for updating patient ID)
     Optional<SlotReservation> findByDoctorIdAndSlotId ( Long doctorId , Long slotId );
+
+    boolean existsByDoctorAndSlot( Doctor doctor, Availability slot);
+
+    boolean existsByDoctorIdAndSlotId ( Long id , Long id1 );
 }
 

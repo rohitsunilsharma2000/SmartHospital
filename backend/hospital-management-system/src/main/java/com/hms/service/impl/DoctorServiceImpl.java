@@ -6,6 +6,9 @@ import com.hms.dto.CreateDoctorRequest;
 import com.hms.dto.DoctorSlotResponse;
 import com.hms.dto.SlotResponse;
 import com.hms.enums.SlotStatus;
+import com.hms.exception.DoctorAlreadyExistsException;
+import com.hms.exception.SlotNotFoundException;
+import com.hms.exception.SlotReservationAlreadyExistsException;
 import com.hms.modal.Availability;
 import com.hms.modal.Doctor;
 import com.hms.modal.SlotReservation;
@@ -41,8 +44,55 @@ public class DoctorServiceImpl implements DoctorService {
 
     @Override
     @Transactional
+    public Doctor registerDoctor(CreateDoctorRequest request, String startTime, String endTime, List<String> days, List<String> dates) {
+        // ✅ Check if doctor with the same name and department already exists
+        if (doctorRepository.existsByNameAndDepartment(request.getName(), request.getDepartment())) {
+            throw new DoctorAlreadyExistsException("Doctor with name " + request.getName() + " and department " + request.getDepartment() + " already exists");
+        }
 
-    public Doctor registerDoctor ( CreateDoctorRequest request , String startTime , String endTime , List<String> days , List<String> dates ) {
+        // ✅ Register doctor
+        Doctor doctor = Doctor.builder()
+                              .name(request.getName())
+                              .department(request.getDepartment())
+                              .outPatient(request.getOutPatient())
+                              .busyTime(request.getBusyTime())
+                              .notificationSchedules(request.getNotificationSchedules())
+                              .build();
+
+        doctor = doctorRepository.save(doctor);
+
+        // ✅ Generate Slots for Doctor
+        List<DoctorSlotResponse> slots = doctorSlotService.generateOrUpdateDoctorSlots(doctor.getId(), startTime, endTime, days, dates);
+
+        // ✅ Track Slot Reservations for the Doctor
+        for (DoctorSlotResponse slotResponse : slots) {
+            for (SlotResponse slot : slotResponse.getSlots()) {
+                Availability slotEntity = availabilityRepository.findById(slot.getSlotId())
+                                                                .orElseThrow(() -> new SlotNotFoundException("Slot with ID " + slot.getSlotId() + " not found"));
+
+                // ✅ Check for duplicate slot reservation before saving
+                if (!slotReservationRepository.existsByDoctorAndSlot(doctor, slotEntity)) {
+                    SlotReservation reservation = SlotReservation.builder()
+                                                                 .doctor(doctor)
+                                                                 .slot(slotEntity)
+                                                                 .status(SlotStatus.AVAILABLE)
+                                                                 .reservationTime(LocalDateTime.now())
+                                                                 .notes("Doctor's availability slot created.")
+                                                                 .build();
+
+                    slotReservationRepository.save(reservation);
+                } else {
+                    throw new SlotReservationAlreadyExistsException("Slot reservation for doctor " + doctor.getName() + " and slot " + slotEntity.getId() + " already exists");
+                }
+            }
+        }
+
+        return doctor;
+    }
+
+    @Transactional
+
+    public Doctor registerDoctorV2 ( CreateDoctorRequest request , String startTime , String endTime , List<String> days , List<String> dates ) {
         // Register doctor
         Doctor doctor = Doctor.builder()
                               .name(request.getName())
@@ -83,33 +133,46 @@ public class DoctorServiceImpl implements DoctorService {
 
     @Override
     @Transactional
-    public List<Doctor> registerMultipleDoctors ( List<CreateDoctorRequest> requests , String startTime , String endTime , List<String> days , List<String> dates ) {
+    public List<Doctor> registerMultipleDoctors(List<CreateDoctorRequest> requests, String startTime, String endTime, List<String> days, List<String> dates) {
+
         List<Doctor> doctors = requests.stream()
                                        .map(request -> {
+                                           // ✅ Check if doctor already exists
+                                           if (doctorRepository.existsByNameAndDepartment(request.getName(), request.getDepartment())) {
+                                               throw new DoctorAlreadyExistsException("Doctor with name " + request.getName() + " and department " + request.getDepartment() + " already exists");
+                                           }
+
+                                           // ✅ Register doctor
                                            Doctor doctor = Doctor.builder()
                                                                  .name(request.getName())
                                                                  .department(request.getDepartment())
                                                                  .outPatient(request.getOutPatient())
                                                                  .busyTime(request.getBusyTime())
-                                                                 .notificationSchedules(
-                                                                         request.getNotificationSchedules())
+                                                                 .notificationSchedules(request.getNotificationSchedules())
                                                                  .build();
+
                                            return doctorRepository.save(doctor);
                                        })
                                        .toList();
 
-        // Generate Slots & Track Reservations for Each Doctor
+        // ✅ Generate Slots & Track Reservations for Each Doctor
         doctors.forEach(doctor -> {
-            List<DoctorSlotResponse> slots = doctorSlotService.generateOrUpdateDoctorSlots(doctor.getId() , startTime ,
-                                                                                           endTime , days , dates);
+            List<DoctorSlotResponse> slots = doctorSlotService.generateOrUpdateDoctorSlots(doctor.getId(), startTime, endTime, days, dates);
 
             for (DoctorSlotResponse slotResponse : slots) {
                 for (SlotResponse slot : slotResponse.getSlots()) {
-                    Availability slotEntity = availabilityRepository.findById(slot.getSlotId())
-                                                                    .orElseThrow(() -> new RuntimeException(
-                                                                            "Slot not found"));
 
-//                     Create Slot Reservation for the Doctor
+                    // ✅ Fetch Slot
+                    Availability slotEntity = availabilityRepository.findById(slot.getSlotId())
+                                                                    .orElseThrow(() -> new SlotNotFoundException("Slot with ID " + slot.getSlotId() + " not found"));
+
+                    // ✅ Check if Slot Reservation Already Exists
+                    boolean reservationExists = slotReservationRepository.existsByDoctorIdAndSlotId(doctor.getId(), slotEntity.getId());
+                    if (reservationExists) {
+                        throw new SlotReservationAlreadyExistsException("Slot reservation for doctor " + doctor.getName() + " and slot " + slotEntity.getId() + " already exists");
+                    }
+
+                    // ✅ Create Slot Reservation
                     SlotReservation reservation = SlotReservation.builder()
                                                                  .doctor(doctor)
                                                                  .slot(slotEntity)
@@ -125,6 +188,7 @@ public class DoctorServiceImpl implements DoctorService {
 
         return doctors;
     }
+
 
     // 1. Get All Doctors
     @Override

@@ -36,6 +36,37 @@ export default function SideBarComponent() {
           </ul>
         </li>
         <li className="nav-item">
+          <a
+            className="nav-link collapsed"
+            data-bs-target="#import-nav"
+            data-bs-toggle="collapse"
+            href="#"
+          >
+            <i className="bi bi-bar-chart"></i>
+            <span>Import</span>
+            <i className="bi bi-chevron-down ms-auto"></i>
+          </a>
+          <ul
+            id="import-nav"
+            className="nav-content collapse"
+            data-bs-parent="#sidebar-nav"
+          >
+            <li>
+              <a href="/pages/doctor/create">
+                <i className="bi bi-circle"></i>
+                <span>Add Doctor</span>
+              </a>
+            </li>
+            <li>
+            <a href="/pages/patient/create">
+            <i className="bi bi-circle"></i>
+                <span>Add Patient</span>
+              </a>
+            </li>
+            
+          </ul>
+        </li>
+        <li className="nav-item">
           <a className="nav-link" href="index.html">
             <i className="bi bi-grid"></i>
             <span>Dashboard</span>
