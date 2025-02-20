@@ -8,4 +8,6 @@ import java.util.Optional;
 
 public interface OpdBillRepository extends JpaRepository<OpdBill, Long> {
     Optional<OpdBill> findByAppointmentId( Long appointmentId);
+
+    boolean existsByAppointmentId ( Long appointmentId );
 }
