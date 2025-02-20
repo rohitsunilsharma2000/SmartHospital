@@ -1,5 +1,7 @@
 package com.hms.service.impl;
 
+import com.hms.api.DoctorResponse;
+import com.hms.dto.AvailabilityResponse;
 import com.hms.dto.CreateDoctorRequest;
 import com.hms.dto.DoctorSlotResponse;
 import com.hms.dto.SlotResponse;
@@ -16,7 +18,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -119,6 +124,72 @@ public class DoctorServiceImpl implements DoctorService {
         });
 
         return doctors;
+    }
+
+    // 1. Get All Doctors
+    @Override
+
+    public List<DoctorResponse> getAllDoctorsWithSlots() {
+        List<Doctor> doctors = doctorRepository.findAllWithAvailabilities();
+        return mapToDoctorResponseList(doctors);
+    }
+
+    // 2. Get Doctor by ID
+    @Override
+
+    public DoctorResponse getDoctorById(Long id) {
+        Doctor doctor = doctorRepository.findByIdWithAvailabilities(id)
+                                        .orElseThrow(() -> new RuntimeException("Doctor not found with ID: " + id));
+        return mapToDoctorResponse(doctor);
+    }
+
+    // 3. Get Doctor by Name
+    @Override
+    public List<DoctorResponse> searchDoctorsByName(String query) {
+        List<Doctor> doctors = doctorRepository.findByNameContainingIgnoreCase(query);
+        return doctors.stream().map(this::mapToDoctorResponse).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<DoctorResponse> searchDoctorsById(String query) {
+        // Validate input (ensure query is numeric)
+        if (!query.matches("\\d+")) {
+            throw new IllegalArgumentException("Query must be numeric");
+        }
+
+        List<Doctor> doctors = doctorRepository.findByIdStartingWith(query);
+
+        // Map entity to response DTO
+        return doctors.stream()
+                      .map(this::mapToDoctorResponse)
+                      .collect(Collectors.toList());
+    }
+
+
+    // Utility Methods
+    private List<DoctorResponse> mapToDoctorResponseList(List<Doctor> doctors) {
+        return doctors.stream().map(this::mapToDoctorResponse).collect(Collectors.toList());
+    }
+
+    private DoctorResponse mapToDoctorResponse(Doctor doctor) {
+        Map<String, List<AvailabilityResponse>> slotsGroupedByHour = doctor.getAvailabilities().stream()
+                                                                           .collect(Collectors.groupingBy(
+                                                                                   availability -> availability.getStartTime().substring(0, 5),
+                                                                                   LinkedHashMap::new,
+                                                                                   Collectors.mapping(availability -> AvailabilityResponse.builder()
+                                                                                                                                          .slotId(availability.getId())
+                                                                                                                                          .startTime(availability.getStartTime())
+                                                                                                                                          .endTime(availability.getEndTime())
+                                                                                                                                          .status(availability.getStatus().name())
+                                                                                                                                          .build(), Collectors.toList())
+                                                                           ));
+
+        return DoctorResponse.builder()
+                             .doctorId(doctor.getId())
+                             .doctorName(doctor.getName())
+                             .department(doctor.getDepartment())
+                             .slots(slotsGroupedByHour)
+                             .build();
     }
 
 }

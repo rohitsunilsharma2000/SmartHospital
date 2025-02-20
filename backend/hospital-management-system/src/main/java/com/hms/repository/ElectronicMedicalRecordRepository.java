@@ -11,5 +11,6 @@ import java.util.Optional;
 public interface ElectronicMedicalRecordRepository extends JpaRepository<ElectronicMedicalRecord, Long> {
 
     Optional<ElectronicMedicalRecord> findByAppointmentId(Long appointmentId);
+
 }
 

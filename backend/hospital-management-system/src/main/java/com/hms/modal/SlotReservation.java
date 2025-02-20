@@ -56,5 +56,6 @@ public class SlotReservation {
 
     private String notes;
 
+
 }
 

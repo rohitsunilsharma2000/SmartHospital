@@ -44,4 +44,6 @@ public class Doctor {
     // One doctor can have many availabilities (time slots).
     @OneToMany(mappedBy = "doctor", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Availability> availabilities;
+
+
 }
