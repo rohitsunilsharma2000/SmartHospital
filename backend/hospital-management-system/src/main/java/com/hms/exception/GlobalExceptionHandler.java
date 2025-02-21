@@ -51,4 +51,10 @@ public class GlobalExceptionHandler {
 //        return buildErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST, request);
 //    }
 
+    @ExceptionHandler(SlotAlreadyBookedException.class)
+    public ResponseEntity<Map<String, Object>> handleSlotAlreadyBookedException(SlotAlreadyBookedException ex, WebRequest request) {
+        return buildErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST, request);
+    }
+
+
 }

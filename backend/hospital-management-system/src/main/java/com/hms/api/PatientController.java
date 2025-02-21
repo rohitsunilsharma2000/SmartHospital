@@ -16,6 +16,12 @@ public class PatientController {
 
     private final PatientService patientService;
 
+    // ✅ Create patient
+    @PostMapping
+    public ResponseEntity<PatientResponse> createPatient(@RequestBody PatientRequest request) {
+        return ResponseEntity.ok(patientService.createPatient(request));
+    }
+
 
     // ✅ Search patients by ID, name, or composite key (type-ahead)
     @GetMapping("/search")

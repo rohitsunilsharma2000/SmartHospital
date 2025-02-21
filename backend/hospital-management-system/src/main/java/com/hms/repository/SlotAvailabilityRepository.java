@@ -28,3 +28,4 @@ public interface SlotAvailabilityRepository extends JpaRepository<SlotAvailabili
                                       @Param("startDate") String startDate,
                                       @Param("endDate") String endDate);
 }
+
