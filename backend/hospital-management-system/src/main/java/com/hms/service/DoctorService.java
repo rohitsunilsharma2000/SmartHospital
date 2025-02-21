@@ -4,6 +4,7 @@ import com.hms.dto.DoctorRequest;
 import com.hms.dto.DoctorResponse;
 import com.hms.exception.DoctorAlreadyExistsException;
 import com.hms.modal.Doctor;
+import com.hms.modal.DoctorFee;
 import com.hms.repository.DoctorRepository;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +30,19 @@ public class DoctorService {
         doctor.setName(request.getName());
         doctor.setSpecialty(request.getSpecialty());
         doctor.setDocLicence(request.getDocLicence());
+
+        //Saves all fees along with the doctor during creation.
+        if (request.getFees() != null && !request.getFees().isEmpty()) {
+            List<DoctorFee> fees = request.getFees().stream().map(feeRequest -> {
+                DoctorFee fee = new DoctorFee();
+                fee.setConsultationType(feeRequest.getConsultationType());
+                fee.setUnitPrice(feeRequest.getUnitPrice());
+                fee.setDoctor(doctor);
+                return fee;
+            }).toList();
+            doctor.setFees(fees);
+        }
+
         return doctorRepository.save(doctor);
     }
 
