@@ -1,29 +1,36 @@
 package com.hms.modal;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.hms.enums.SlotStatus;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
 
 @Entity
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class SlotAvailability {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private LocalTime startTime;
-    private LocalTime endTime;
-    private String days; // Example: "Mon, Tue, Wed"
-    private LocalDate startDate;
-    private LocalDate endDate;
+//    @Column(unique = true, nullable = false) // Ensure it's marked as unique
+    private String slotNumber;
+    private String time;
+
+    @Enumerated(EnumType.STRING)
+    private SlotStatus status;
+
+    private String startDate;
+    private String endDate;
 
     @ManyToOne
-    @JoinColumn(name = "doctor_id",nullable = false)
-    @JsonBackReference
+    @JoinColumn(name = "doctor_id", nullable = false)
     private Doctor doctor;
 
 }

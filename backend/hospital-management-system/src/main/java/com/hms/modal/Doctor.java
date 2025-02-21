@@ -1,13 +1,18 @@
 package com.hms.modal;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
 
 @Entity
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Doctor {
 
     @Id
@@ -17,15 +22,9 @@ public class Doctor {
     private String name;
     private String specialty;
 
-    // Unique constraint ensures the database rejects duplicate entries.
     @Column(unique = true)
     private String docLicence;
 
-    // Lazy loading: The slotAvailabilities collection will not be loaded until accessed.
-    @OneToMany(mappedBy = "doctor",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
-    @JsonManagedReference
+    @OneToMany(mappedBy = "doctor", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SlotAvailability> slotAvailabilities;
-
-
-
 }

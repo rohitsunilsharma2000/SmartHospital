@@ -5,7 +5,6 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 
@@ -45,5 +44,11 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleDoctorAlreadyExistsException(DoctorAlreadyExistsException ex, WebRequest request) {
         return buildErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST, request);
     }
+
+    // ✅ SlotAlreadyExistsException
+//    @ExceptionHandler(SlotAlreadyExistsException.class)
+//    public ResponseEntity<Map<String, Object>> handleSlotAlreadyExistsException(SlotAlreadyExistsException ex, WebRequest request) {
+//        return buildErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST, request);
+//    }
 
 }
