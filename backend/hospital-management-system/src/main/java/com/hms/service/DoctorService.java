@@ -1,10 +1,13 @@
 package com.hms.service;
 
+import com.hms.dto.DoctorFeeRequest;
+import com.hms.dto.DoctorFeeResponse;
 import com.hms.dto.DoctorRequest;
 import com.hms.dto.DoctorResponse;
 import com.hms.exception.DoctorAlreadyExistsException;
 import com.hms.modal.Doctor;
 import com.hms.modal.DoctorFee;
+import com.hms.repository.DoctorFeeRepository;
 import com.hms.repository.DoctorRepository;
 import org.springframework.stereotype.Service;
 
@@ -16,9 +19,10 @@ import java.util.stream.Collectors;
 public class DoctorService {
 
     private final DoctorRepository doctorRepository;
-
-    public DoctorService ( DoctorRepository doctorRepository ) {
+    private final DoctorFeeRepository doctorFeeRepository;
+    public DoctorService ( DoctorRepository doctorRepository , DoctorFeeRepository doctorFeeRepository ) {
         this.doctorRepository = doctorRepository;
+        this.doctorFeeRepository = doctorFeeRepository;
     }
 
     public Doctor createDoctor( DoctorRequest request) {
@@ -78,4 +82,5 @@ public class DoctorService {
         response.setDocLicence(doctor.getDocLicence());
         return response;
     }
+
 }

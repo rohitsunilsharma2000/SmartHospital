@@ -14,4 +14,6 @@ public interface DoctorRepository extends JpaRepository<Doctor,Long> {
     List<Doctor> findByNameContainingIgnoreCase ( String name );
 
     boolean existsByDocLicence ( String docLicence );
+
+
 }
