@@ -90,5 +90,21 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(ex.getMessage(), HttpStatus.NOT_FOUND, request);
     }
 
+    @ExceptionHandler(PrescriptionNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handlePrescriptionNotFoundException(PrescriptionNotFoundException ex, WebRequest request) {
+        log.error("BookingNotFoundException: {}", ex.getMessage());
+        return buildErrorResponse(ex.getMessage(), HttpStatus.NOT_FOUND, request);
+    }
+
+    @ExceptionHandler(PrescribedTestNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handlePrescribedTestNotFoundException(PrescribedTestNotFoundException ex, WebRequest request) {
+        log.error("PrescribedTestNotFoundException: {}", ex.getMessage());
+        return buildErrorResponse(ex.getMessage(), HttpStatus.NOT_FOUND, request);
+    }
+    @ExceptionHandler(EMRAlreadyExistsException.class)
+    public ResponseEntity<Map<String, Object>> handleEMRAlreadyExistsException(EMRAlreadyExistsException ex, WebRequest request) {
+        log.error("EMRAlreadyExistsException: {}", ex.getMessage());
+        return buildErrorResponse(ex.getMessage(), HttpStatus.CONFLICT, request);
+    }
 
 }
