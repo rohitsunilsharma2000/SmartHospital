@@ -107,4 +107,15 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(ex.getMessage(), HttpStatus.CONFLICT, request);
     }
 
+    @ExceptionHandler(MedicineNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleMedicineNotFoundException(MedicineNotFoundException ex, WebRequest request) {
+        log.error("MedicineNotFoundException: {}", ex.getMessage());
+        return buildErrorResponse(ex.getMessage(), HttpStatus.CONFLICT, request);
+    }
+    @ExceptionHandler(MedicineAlreadyExistsException.class)
+    public ResponseEntity<Map<String, Object>> handleMedicineAlreadyExistsException(MedicineAlreadyExistsException ex, WebRequest request) {
+        log.error("MedicineAlreadyExistsException: {}", ex.getMessage());
+        return buildErrorResponse(ex.getMessage(), HttpStatus.CONFLICT, request);
+    }
+
 }

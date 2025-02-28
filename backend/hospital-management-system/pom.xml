@@ -173,6 +173,11 @@
 			<artifactId>itextpdf</artifactId>
 			<version>5.5.13.2</version>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-csv</artifactId>
+			<version>1.9.0</version>
+		</dependency>
 
 
 
