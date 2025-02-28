@@ -118,4 +118,10 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(ex.getMessage(), HttpStatus.CONFLICT, request);
     }
 
+    @ExceptionHandler(StockNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleMedicineStockNotFoundException(StockNotFoundException ex, WebRequest request) {
+        log.error("StockNotFoundException: {}", ex.getMessage());
+        return buildErrorResponse(ex.getMessage(), HttpStatus.CONFLICT, request);
+    }
+
 }
