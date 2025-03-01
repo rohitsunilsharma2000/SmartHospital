@@ -17,17 +17,21 @@ public class PrescriptionTemplateController {
 
     private final PrescriptionTemplateService templateService;
 
-    // ✅ Create or update a template
-// ✅ Create or Update a Prescription Template
-    @PostMapping({"/", "/{id}"})
-    public ResponseEntity<PrescriptionTemplate> saveOrUpdateTemplate(
-            @PathVariable(required = false) Long id,
-            @RequestBody PrescriptionTemplateRequest request) {
 
-        PrescriptionTemplate savedTemplate = templateService.saveOrUpdateTemplate(id, request);
+    // ✅ Create a new template
+    @PostMapping
+    public ResponseEntity<PrescriptionTemplate> createTemplate(@RequestBody PrescriptionTemplateRequest request) {
+        PrescriptionTemplate savedTemplate = templateService.saveOrUpdateTemplate(null, request);
         return ResponseEntity.ok(savedTemplate);
     }
 
+    // ✅ Update an existing template
+    @PutMapping("/{id}")
+    public ResponseEntity<PrescriptionTemplate> updateTemplate(@PathVariable Long id,
+                                                               @RequestBody PrescriptionTemplateRequest request) {
+        PrescriptionTemplate savedTemplate = templateService.saveOrUpdateTemplate(id, request);
+        return ResponseEntity.ok(savedTemplate);
+    }
 
 
     // ✅ Get all templates

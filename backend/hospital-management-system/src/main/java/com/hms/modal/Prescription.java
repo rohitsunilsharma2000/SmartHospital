@@ -55,5 +55,10 @@ public class Prescription {
     private List<String> customTests;
 
     private String prescriptionDate;
+
+    // ✅ NEW FIELD: Link Prescription to a SlotBooking
+    @OneToOne
+    @JoinColumn(name = "slot_booking_id", unique = true)
+    private SlotBooking slotBooking;
 }
 

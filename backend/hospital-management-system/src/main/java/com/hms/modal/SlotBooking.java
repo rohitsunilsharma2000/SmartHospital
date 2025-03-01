@@ -34,4 +34,8 @@ public class SlotBooking {
     @ManyToOne
     @JoinColumn(name = "doctor_id", nullable = false)
     private Doctor doctor;
+
+    // ✅ NEW FIELD: Link SlotBooking to a Prescription
+    @OneToOne(mappedBy = "slotBooking", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Prescription prescription;
 }

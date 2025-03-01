@@ -14,4 +14,6 @@ public interface BillRepository extends JpaRepository<Bill, Long> {
     boolean existsByBookingId ( Long bookingId );
 
     boolean existsByBookingIdAndIdNot ( Long bookingId , Long billId );
+
+//    boolean existsByBookingIdAndBillCategory ( Long bookingId , BillCategory pharmacy );
 }
